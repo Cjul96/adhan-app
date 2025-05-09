@@ -4,7 +4,7 @@ export interface Prayer {
     time: string;
     isNext: boolean;
     notified: boolean; // Track if notification was already sent
-    img:string;
+    img?: string;
 }
 export interface PrayerTimesResponse {
     code: number;
