@@ -4,7 +4,7 @@
     let darkMode: boolean = false;
     let currentTime: Date = new Date();
     let clockInterval: number;
-    let hijriDate = "";
+    export let hijriDate: string;
     function toggleDarkMode() {
         darkMode = !darkMode;
         localStorage.setItem("darkMode", String(darkMode));
@@ -74,7 +74,7 @@
                 day: "numeric",
             })}
         </div>
-        <div class="text-xs text-gray-500 dark:text-gray-400">
+        <div class="text-right text-xs text-gray-500 dark:text-gray-400">
             {hijriDate}
         </div>
     </div>

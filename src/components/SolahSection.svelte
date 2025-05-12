@@ -7,7 +7,8 @@
     export let loading: boolean;
     let selectedMethod = "3";
     let prayerResponse: PrayerTimesResponse;
-    let prayerList: Prayer[];
+    export let prayerList: Prayer[];
+    export let hijriDate:string;
     export async function fetchPrayerTimes() {
         console.log("here");
         const today = new Date();
@@ -27,47 +28,47 @@
                     time: timings.Fajr,
                     isNext: false,
                     notified: false,
-                    img: "",
+                    img: "fajr.png",
                 },
                 {
                     name: "Sunrise",
                     time: timings.Sunrise,
                     isNext: false,
                     notified: false,
-                    img: "",
+                    img: "sunrise.png",
                 },
                 {
                     name: "Dhuhr",
                     time: timings.Dhuhr,
                     isNext: false,
                     notified: false,
-                    img: "",
+                    img: "dhuhr.png",
                 },
                 {
                     name: "Asr",
                     time: timings.Asr,
                     isNext: false,
                     notified: false,
-                    img: "",
+                    img: "asr.png",
                 },
                 {
                     name: "Maghrib",
                     time: timings.Maghrib,
                     isNext: false,
                     notified: false,
-                    img: "",
+                    img: "maghrib.png",
                 },
                 {
                     name: "Isha",
                     time: timings.Isha,
                     isNext: false,
                     notified: false,
-                    img: "",
+                    img: "isya.png",
                 },
             ];
 
             // Get hijri date
-            // hijriDate = `${data.data.date.hijri.date.substring(0, 2)} ${data.data.date.hijri.month.en} ${data.data.date.hijri.year} ${data.data.date.hijri.designation.abbreviated}`;
+            hijriDate = `${prayerResponse.data.date.hijri.date.substring(0, 2)} ${prayerResponse.data.date.hijri.month.en} ${prayerResponse.data.date.hijri.year} ${prayerResponse.data.date.hijri.designation.abbreviated}`;
             loading = false;
             // updateNextPrayer();
         } else {

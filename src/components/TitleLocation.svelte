@@ -1,7 +1,10 @@
 <script lang="ts">
+    import SolahSection from "./SolahSection.svelte";
     export let lat: number = 0;
     export let long: number = 0;
     export let locationLoading: boolean;
+    // export let solahSection: SolahSection;
+
     let locationName: string = "Loading location...";
     // Get user coordinates
     export async function getUserLocation() {
@@ -41,6 +44,7 @@
                     }
                 }
                 locationLoading = false;
+                // await solahSection.fetchPrayerTimes();
             } catch (error) {
                 console.error("Error fetching location name:", error);
                 locationName = "Unknown location";

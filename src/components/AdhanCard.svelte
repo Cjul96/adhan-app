@@ -11,7 +11,7 @@
 
 <div
     class="{prayer.isNext ? '' : ''} 
-        bg-white rounded-lg shadow-sm transition-colors p-4 flex items-center justify-between bg-left bg-cover bg-no-repeat dark:bg-green-950/30 dark:border dark:border-green-500 dark:shadow-md dark:shadow-green-500
+        bg-white rounded-lg shadow-sm transition-colors p-4 flex items-center justify-between bg-bottom bg-cover bg-no-repeat dark:bg-green-950/30 dark:border dark:border-green-500 dark:shadow-md dark:shadow-green-500 inset-shadow-md inset-shadow-white/50 dark:inset-shadow-green-950/50
         "
     style="background-image: url('{prayer.img}');"
 >
