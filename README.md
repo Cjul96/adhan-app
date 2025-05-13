@@ -26,7 +26,7 @@ A beautiful, cross-platform desktop application for Islamic prayer times, notifi
 
 ### Download Pre-built Binaries
 
-Download the latest version for your operating system from the [Releases](https://github.com/yourusername/adhan-app/releases) page.
+Download the latest version for your operating system from the [Releases](https://github.com/Cjul96/adhan-app/releases) page.
 
 ### Build from Source
 
@@ -40,7 +40,7 @@ Download the latest version for your operating system from the [Releases](https:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/adhan-app.git
+   git clone https://github.com/Cjul96/adhan-app.git
    cd adhan-app
    ```
 
