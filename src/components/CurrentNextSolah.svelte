@@ -2,11 +2,13 @@
     import type { Prayer } from "$lib/dto/dto";
     import { onMount } from "svelte";
     import Loading from "./Loading.svelte";
-    let message: string = "Prayer Time";
     export let isCurrentSolah: boolean;
     export let prayer: Prayer;
+    let adhanAudio: HTMLAudioElement;
+    let message: string = "Prayer Time";
     let countdownText = "";
     let clockInterval: number;
+    let adhanPlaying = false;
 
     function nextTime() {
         const currentTime = new Date();
@@ -28,6 +30,17 @@
         // Format countdown
         countdownText = `${String(diffHrs).padStart(2, "0")}:${String(diffMins).padStart(2, "0")}:${String(diffSecs).padStart(2, "0")}`;
     }
+    // Play Adhan
+    function toggleAdhan() {
+        if (adhanPlaying) {
+            adhanAudio.pause();
+            adhanAudio.currentTime = 0;
+            adhanPlaying = false;
+        } else {
+            adhanAudio.play();
+            adhanPlaying = true;
+        }
+    }
     onMount(async () => {
         while (prayer == undefined) {
             await new Promise((f) => setTimeout(f, 1000));
@@ -37,6 +50,12 @@
                 nextTime();
             }, 1000);
         }
+
+        // Initialize audio
+        adhanAudio = new Audio("/audio/adhan.mp3");
+        adhanAudio.addEventListener("ended", () => {
+            adhanPlaying = false;
+        });
     });
 </script>
 
@@ -86,5 +105,40 @@
     <h3 class="text-3xl font-bold">{prayer?.name}</h3>
     {#if !isCurrentSolah}
         <span>{countdownText}</span>
+    {:else}
+        <button
+            class="flex items-center bg-white dark:bg-green-500 text-black dark:text-white hover:bg-blue-50 dark:hover:bg-green-600 font-medium px-4 py-2 rounded-lg transition cursor-pointer"
+            on:click={toggleAdhan}
+        >
+            {#if adhanPlaying}
+                <svg
+                    class="w-5 h-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+                Stop Adhan
+            {:else}
+                <svg
+                    class="w-5 h-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                        clip-rule="evenodd"
+                    />
+                </svg>
+                Play Adhan
+            {/if}
+        </button>
     {/if}
 </div>
