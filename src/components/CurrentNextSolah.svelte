@@ -7,12 +7,12 @@
     export let prayer: Prayer;
     export let notificationsEnabled = true;
     export let notificationPermissionGranted = false;
-	export let notificationTime = 226; // minutes before prayer
+    export let notificationTime = 15; // minutes before prayer
+    export let adhanPlaying = false;
     let adhanAudio: HTMLAudioElement;
     let message: string = "Prayer Time";
     let countdownText = "";
     let clockInterval: number;
-    let adhanPlaying = false;
 
     function nextTime() {
         const currentTime = new Date();
@@ -36,10 +36,7 @@
         const totalMinutes = diffHrs * 60 + diffMins;
         // Notification at exact notification time
         if (totalMinutes === notificationTime && diffSecs === 0) {
-            sendPrayerNotification(
-                prayer.name,
-                notificationTime,
-            );
+            sendPrayerNotification(prayer.name, notificationTime);
             // Don't mark as notified yet - we'll have another notification at prayer time
         }
 

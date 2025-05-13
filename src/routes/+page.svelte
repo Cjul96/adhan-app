@@ -6,6 +6,11 @@
 	import Loading from "../components/Loading.svelte";
 	import SolahSection from "../components/SolahSection.svelte";
 	import TitleLocation from "../components/TitleLocation.svelte";
+	import SettingCard from "../components/SettingCard.svelte";
+	import {
+		isPermissionGranted,
+		requestPermission,
+	} from "@tauri-apps/plugin-notification";
 
 	let loading: boolean = true;
 	let currentSolah: boolean = true;
@@ -22,6 +27,10 @@
 	let hijriDate: string;
 	let message: string = "Location";
 	let nextPrayerIndex: number;
+	let adhanPlaying = false;
+	let notificationPermissionGranted = false;
+	let notificationsEnabled = true;
+	let notificationTime = 15; // minutes before prayer
 	async function getCurrentAndNextPrayer() {
 		prayerList.forEach((prayer) => (prayer.isNext = false));
 		const currentTime = new Date();
@@ -44,19 +53,51 @@
 			nextPrayer = prayerList[nextPrayerIndex];
 		}
 	}
+	// Check notification permission
+	async function checkNotificationPermission() {
+		try {
+			notificationPermissionGranted = await isPermissionGranted();
+
+			if (!notificationPermissionGranted) {
+				const permission = await requestPermission();
+				notificationPermissionGranted = permission === "granted";
+			}
+
+			// Load notification settings from localStorage
+			const savedNotificationsEnabled = localStorage.getItem(
+				"notificationsEnabled",
+			);
+			if (savedNotificationsEnabled !== null) {
+				notificationsEnabled = savedNotificationsEnabled === "true";
+			}
+
+			const savedNotificationTime =
+				localStorage.getItem("notificationTime");
+			if (savedNotificationTime !== null) {
+				notificationTime = parseInt(savedNotificationTime);
+			}
+		} catch (error) {
+			console.error("Error checking notification permission:", error);
+			notificationPermissionGranted = false;
+		}
+	}
 	onMount(async () => {
 		await locationSection.getUserLocation();
 		await solahSection.fetchPrayerTimes();
 		clockInterval = setInterval(async () => {
 			await getCurrentAndNextPrayer();
 		}, 2000);
+		// Check notification permissions
+		await checkNotificationPermission();
 	});
 </script>
 
 <div class=" bg-green-200 dark:bg-gray-950 h-svh w-svw">
-	<div class=" bg-transparent grid grid-cols-1 gap-2 h-full p-2">
+	<div class="bg-transparent h-full p-2">
 		<!-- Title and Live Time -->
-		<div class="grid grid-cols-2 gap-2 bg-transparent">
+		<div
+			class="grid grid-cols-2 gap-2 bg-transparent max-h-2/12 min-h-2/12 py-2"
+		>
 			<TitleLocation
 				bind:lat
 				bind:long
@@ -66,21 +107,30 @@
 			<LiveTime {hijriDate} />
 		</div>
 		{#if locationLoading}
-			<div class=" row-span-11">
+			<div class=" row-span-11 max-h-11/12 min-h-11/12 h-11/12">
 				<Loading {message} />
 			</div>
 		{:else}
-			<div class="bg-transparent grid grid-cols-2 gap-2 row-span-5">
+			<div
+				class="bg-transparent grid grid-cols-2 gap-2 row-span-5 max-h-3/12 min-h-3/12 py-2"
+			>
 				<CurrentNextSolah
 					bind:isCurrentSolah={currentSolah}
 					bind:prayer={currentPrayer}
+					bind:adhanPlaying
 				/>
 				<CurrentNextSolah
 					bind:isCurrentSolah={notCurrentSolah}
 					bind:prayer={nextPrayer}
+					bind:notificationsEnabled
+					bind:notificationPermissionGranted
+					bind:notificationTime
+					bind:adhanPlaying
 				/>
 			</div>
-			<div class="bg-transparent grid grid-cols-3 gap-2 row-span-3">
+			<div
+				class="bg-transparent grid grid-cols-3 gap-2 row-span-3 max-h-3/12 min-h-3/12 py-2"
+			>
 				<SolahSection
 					bind:hijriDate
 					bind:lat
@@ -90,12 +140,14 @@
 					bind:this={solahSection}
 				/>
 			</div>
-			<div class="bg-transparent grid grid-cols-1 gap-2 row-span-3">
-				<div
-					class=" bg-white dark:bg-green-950/30 dark:border dark:border-green-500 dark:shadow-md dark:shadow-green-500 rounded-lg border"
-				>
-					Setting
-				</div>
+			<div
+				class="bg-transparent grid grid-cols-1 gap-2 row-span-3 max-h-4/12 min-h-4/12 py-2"
+			>
+				<SettingCard
+					{notificationPermissionGranted}
+					{notificationsEnabled}
+					{notificationTime}
+				/>
 			</div>
 		{/if}
 		<!-- Current and Next Solah -->
