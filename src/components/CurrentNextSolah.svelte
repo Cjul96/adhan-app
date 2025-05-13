@@ -2,8 +2,12 @@
     import type { Prayer } from "$lib/dto/dto";
     import { onMount } from "svelte";
     import Loading from "./Loading.svelte";
+    import { sendNotification } from "@tauri-apps/plugin-notification";
     export let isCurrentSolah: boolean;
     export let prayer: Prayer;
+    export let notificationsEnabled = true;
+    export let notificationPermissionGranted = false;
+	export let notificationTime = 226; // minutes before prayer
     let adhanAudio: HTMLAudioElement;
     let message: string = "Prayer Time";
     let countdownText = "";
@@ -29,6 +33,21 @@
         // console.log("hrs:" + diffHrs + " min:" + diffMins + " sec:" + diffSecs);
         // Format countdown
         countdownText = `${String(diffHrs).padStart(2, "0")}:${String(diffMins).padStart(2, "0")}:${String(diffSecs).padStart(2, "0")}`;
+        const totalMinutes = diffHrs * 60 + diffMins;
+        // Notification at exact notification time
+        if (totalMinutes === notificationTime && diffSecs === 0) {
+            sendPrayerNotification(
+                prayer.name,
+                notificationTime,
+            );
+            // Don't mark as notified yet - we'll have another notification at prayer time
+        }
+
+        // Notification at prayer time
+        if (totalMinutes === 0 && diffSecs === 0) {
+            sendPrayerNotification(prayer.name, 0);
+            prayer.notified = true;
+        }
     }
     // Play Adhan
     function toggleAdhan() {
@@ -39,6 +58,31 @@
         } else {
             adhanAudio.play();
             adhanPlaying = true;
+        }
+    }
+    // Send prayer notification
+    async function sendPrayerNotification(
+        prayerName: string,
+        minutesRemaining: number,
+    ) {
+        try {
+            if (!notificationsEnabled || !notificationPermissionGranted) return;
+            const message =
+                minutesRemaining > 0
+                    ? `${prayerName} prayer will be in ${minutesRemaining} minutes.`
+                    : `It's time for ${prayerName} prayer.`;
+
+            // Using the plugin-notification import
+            await sendNotification({
+                title: `Prayer Time: ${prayerName}`,
+                body: message,
+                icon: "public/icon.png", // Update this path as needed
+            });
+
+            // Play adhan audio
+            if (!adhanPlaying && minutesRemaining == 0) toggleAdhan();
+        } catch (error) {
+            console.error("Error sending notification:", error);
         }
     }
     onMount(async () => {
