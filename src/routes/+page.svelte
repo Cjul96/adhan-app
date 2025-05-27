@@ -12,144 +12,107 @@
 		requestPermission,
 	} from "@tauri-apps/plugin-notification";
 
-	let loading: boolean = true;
-	let currentSolah: boolean = true;
-	let notCurrentSolah: boolean = false;
-	let locationLoading: boolean = true;
-	let locationSection: TitleLocation;
-	let solahSection: SolahSection;
-	let prayerList: Prayer[];
-	let clockInterval: number;
-	let currentPrayer: Prayer;
-	let nextPrayer: Prayer;
-	let lat: number = 0;
-	let long: number = 0;
-	let hijriDate: string;
-	let message: string = "Location";
-	let nextPrayerIndex: number;
-	let adhanPlaying = false;
-	let notificationPermissionGranted = false;
-	let notificationsEnabled = true;
-	let notificationTime = 15; // minutes before prayer
-	async function getCurrentAndNextPrayer() {
-		prayerList.forEach((prayer) => (prayer.isNext = false));
-		const currentTime = new Date();
-		const currentTimeStr = `${String(currentTime.getHours()).padStart(2, "0")}:${String(currentTime.getMinutes()).padStart(2, "0")}`;
-		// Find the next prayer
-		nextPrayerIndex = -1;
-		for (let i = 0; i < prayerList.length; i++) {
-			if (prayerList[i].time > currentTimeStr) {
-				nextPrayerIndex = i;
-				break;
-			}
-		}
-		if (nextPrayerIndex === -1) {
-			currentPrayer = prayerList[5];
-			nextPrayer = prayerList[0];
-			nextPrayer.name = "Fajr (Tomorrow)";
-			nextPrayerIndex = 0;
-		} else {
-			currentPrayer = prayerList[nextPrayerIndex - 1];
-			nextPrayer = prayerList[nextPrayerIndex];
-		}
-	}
-	// Check notification permission
-	async function checkNotificationPermission() {
-		try {
-			notificationPermissionGranted = await isPermissionGranted();
-
-			if (!notificationPermissionGranted) {
-				const permission = await requestPermission();
-				notificationPermissionGranted = permission === "granted";
-			}
-
-			// Load notification settings from localStorage
-			const savedNotificationsEnabled = localStorage.getItem(
-				"notificationsEnabled",
-			);
-			if (savedNotificationsEnabled !== null) {
-				notificationsEnabled = savedNotificationsEnabled === "true";
-			}
-
-			const savedNotificationTime =
-				localStorage.getItem("notificationTime");
-			if (savedNotificationTime !== null) {
-				notificationTime = parseInt(savedNotificationTime);
-			}
-		} catch (error) {
-			console.error("Error checking notification permission:", error);
-			notificationPermissionGranted = false;
-		}
-	}
-	onMount(async () => {
-		await locationSection.getUserLocation();
-		await solahSection.fetchPrayerTimes();
-		clockInterval = setInterval(async () => {
-			await getCurrentAndNextPrayer();
-		}, 2000);
-		// Check notification permissions
-		await checkNotificationPermission();
-	});
+	onMount(async () => {});
 </script>
 
 <div class=" bg-green-200 dark:bg-gray-950 h-svh w-svw">
-	<div class="bg-transparent h-full p-2">
-		<!-- Title and Live Time -->
+	<div
+		class="w-full h-full bg-cover bg-no-repeat bg-bottom"
+		style="background-image: url('fajr.png');"
+	>
 		<div
-			class="grid grid-cols-2 gap-2 bg-transparent max-h-2/12 min-h-2/12 py-2"
+			class=" fixed bottom-4 justify-center w-full text-white flex gap-4 lg:px-90 px-30"
 		>
-			<TitleLocation
-				bind:lat
-				bind:long
-				bind:locationLoading
-				bind:this={locationSection}
-			/>
-			<LiveTime {hijriDate} />
+			<div class=" w-full text-center">
+				<svg
+				class=" w-1/2 m-auto"
+					viewBox="0 0 500 500"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M500 343H0V333H500V343ZM266.749 206.904C267.915 207.032 269.076 207.173 270.233 207.327L298.596 161.94L302.326 215.303C303.842 215.864 305.347 216.448 306.839 217.057L345.643 180.236L335.888 232.862C337.205 233.781 338.508 234.719 339.794 235.679L386.61 209.729L363.984 258.247C365.029 259.462 366.057 260.693 367.063 261.941L418.89 248.54L384.858 289.822C385.57 291.268 386.261 292.725 386.927 294.196H440.422L397.136 325.643C397.16 325.762 397.183 325.881 397.207 326H384.134C370.829 264.266 315.924 218 250.211 218C184.498 218 129.593 264.266 116.288 326H103.213C103.237 325.882 103.26 325.763 103.284 325.645L60 294.196H113.495C113.981 293.123 114.478 292.056 114.988 290.997L80.6016 250.016L132.543 262.965C133.538 261.708 134.552 260.465 135.586 259.241L112.54 210.925L159.582 236.466C160.859 235.496 162.152 234.545 163.461 233.615L153.249 181.076L192.372 217.56C193.859 216.938 195.357 216.337 196.867 215.762L200.135 162.37L228.889 207.505C230.475 207.279 232.069 207.08 233.67 206.904L250.211 156L266.749 206.904ZM250.211 228C310.374 228 360.764 269.834 373.883 326H126.539C139.658 269.834 190.048 228 250.211 228Z"
+						fill="currentColor"
+					/>
+				</svg>
+				<h6>Fajr</h6>
+				<span>5:16AM</span>
+			</div>
+			<div class=" w-full text-center">
+				<svg
+				class=" w-1/2 m-auto"
+					viewBox="0 0 500 500"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M500 343H0V333H500V343ZM266.749 206.904C267.915 207.032 269.076 207.173 270.233 207.327L298.596 161.94L302.326 215.303C303.842 215.864 305.347 216.448 306.839 217.057L345.643 180.236L335.888 232.862C337.205 233.781 338.508 234.719 339.794 235.679L386.61 209.729L363.984 258.247C365.029 259.462 366.057 260.693 367.063 261.941L418.89 248.54L384.858 289.822C385.57 291.268 386.261 292.725 386.927 294.196H440.422L397.136 325.643C397.16 325.762 397.183 325.881 397.207 326H384.134C370.829 264.266 315.924 218 250.211 218C184.498 218 129.593 264.266 116.288 326H103.213C103.237 325.882 103.26 325.763 103.284 325.645L60 294.196H113.495C113.981 293.123 114.478 292.056 114.988 290.997L80.6016 250.016L132.543 262.965C133.538 261.708 134.552 260.465 135.586 259.241L112.54 210.925L159.582 236.466C160.859 235.496 162.152 234.545 163.461 233.615L153.249 181.076L192.372 217.56C193.859 216.938 195.357 216.337 196.867 215.762L200.135 162.37L228.889 207.505C230.475 207.279 232.069 207.08 233.67 206.904L250.211 156L266.749 206.904ZM250.211 228C310.374 228 360.764 269.834 373.883 326H126.539C139.658 269.834 190.048 228 250.211 228Z"
+						fill="currentColor"
+					/>
+				</svg>
+				<h6>Fajr</h6>
+				<span>5:16AM</span>
+			</div>
+			<div class=" w-full text-center">
+				<svg
+				class=" w-1/2 m-auto"
+					viewBox="0 0 500 500"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M500 343H0V333H500V343ZM266.749 206.904C267.915 207.032 269.076 207.173 270.233 207.327L298.596 161.94L302.326 215.303C303.842 215.864 305.347 216.448 306.839 217.057L345.643 180.236L335.888 232.862C337.205 233.781 338.508 234.719 339.794 235.679L386.61 209.729L363.984 258.247C365.029 259.462 366.057 260.693 367.063 261.941L418.89 248.54L384.858 289.822C385.57 291.268 386.261 292.725 386.927 294.196H440.422L397.136 325.643C397.16 325.762 397.183 325.881 397.207 326H384.134C370.829 264.266 315.924 218 250.211 218C184.498 218 129.593 264.266 116.288 326H103.213C103.237 325.882 103.26 325.763 103.284 325.645L60 294.196H113.495C113.981 293.123 114.478 292.056 114.988 290.997L80.6016 250.016L132.543 262.965C133.538 261.708 134.552 260.465 135.586 259.241L112.54 210.925L159.582 236.466C160.859 235.496 162.152 234.545 163.461 233.615L153.249 181.076L192.372 217.56C193.859 216.938 195.357 216.337 196.867 215.762L200.135 162.37L228.889 207.505C230.475 207.279 232.069 207.08 233.67 206.904L250.211 156L266.749 206.904ZM250.211 228C310.374 228 360.764 269.834 373.883 326H126.539C139.658 269.834 190.048 228 250.211 228Z"
+						fill="currentColor"
+					/>
+				</svg>
+				<h6>Fajr</h6>
+				<span>5:16AM</span>
+			</div>
+			<div class=" w-full text-center">
+				<svg
+				class=" w-1/2 m-auto"
+					viewBox="0 0 500 500"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M500 343H0V333H500V343ZM266.749 206.904C267.915 207.032 269.076 207.173 270.233 207.327L298.596 161.94L302.326 215.303C303.842 215.864 305.347 216.448 306.839 217.057L345.643 180.236L335.888 232.862C337.205 233.781 338.508 234.719 339.794 235.679L386.61 209.729L363.984 258.247C365.029 259.462 366.057 260.693 367.063 261.941L418.89 248.54L384.858 289.822C385.57 291.268 386.261 292.725 386.927 294.196H440.422L397.136 325.643C397.16 325.762 397.183 325.881 397.207 326H384.134C370.829 264.266 315.924 218 250.211 218C184.498 218 129.593 264.266 116.288 326H103.213C103.237 325.882 103.26 325.763 103.284 325.645L60 294.196H113.495C113.981 293.123 114.478 292.056 114.988 290.997L80.6016 250.016L132.543 262.965C133.538 261.708 134.552 260.465 135.586 259.241L112.54 210.925L159.582 236.466C160.859 235.496 162.152 234.545 163.461 233.615L153.249 181.076L192.372 217.56C193.859 216.938 195.357 216.337 196.867 215.762L200.135 162.37L228.889 207.505C230.475 207.279 232.069 207.08 233.67 206.904L250.211 156L266.749 206.904ZM250.211 228C310.374 228 360.764 269.834 373.883 326H126.539C139.658 269.834 190.048 228 250.211 228Z"
+						fill="currentColor"
+					/>
+				</svg>
+				<h6>Fajr</h6>
+				<span>5:16AM</span>
+			</div>
+			<div class=" w-full text-center">
+				<svg
+				class=" w-1/2 m-auto"
+					viewBox="0 0 500 500"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M500 343H0V333H500V343ZM266.749 206.904C267.915 207.032 269.076 207.173 270.233 207.327L298.596 161.94L302.326 215.303C303.842 215.864 305.347 216.448 306.839 217.057L345.643 180.236L335.888 232.862C337.205 233.781 338.508 234.719 339.794 235.679L386.61 209.729L363.984 258.247C365.029 259.462 366.057 260.693 367.063 261.941L418.89 248.54L384.858 289.822C385.57 291.268 386.261 292.725 386.927 294.196H440.422L397.136 325.643C397.16 325.762 397.183 325.881 397.207 326H384.134C370.829 264.266 315.924 218 250.211 218C184.498 218 129.593 264.266 116.288 326H103.213C103.237 325.882 103.26 325.763 103.284 325.645L60 294.196H113.495C113.981 293.123 114.478 292.056 114.988 290.997L80.6016 250.016L132.543 262.965C133.538 261.708 134.552 260.465 135.586 259.241L112.54 210.925L159.582 236.466C160.859 235.496 162.152 234.545 163.461 233.615L153.249 181.076L192.372 217.56C193.859 216.938 195.357 216.337 196.867 215.762L200.135 162.37L228.889 207.505C230.475 207.279 232.069 207.08 233.67 206.904L250.211 156L266.749 206.904ZM250.211 228C310.374 228 360.764 269.834 373.883 326H126.539C139.658 269.834 190.048 228 250.211 228Z"
+						fill="currentColor"
+					/>
+				</svg>
+				<h6>Fajr</h6>
+				<span>5:16AM</span>
+			</div>
+			<div class=" w-full text-center">
+				<svg
+				class=" w-1/2 m-auto"
+					viewBox="0 0 500 500"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M500 343H0V333H500V343ZM266.749 206.904C267.915 207.032 269.076 207.173 270.233 207.327L298.596 161.94L302.326 215.303C303.842 215.864 305.347 216.448 306.839 217.057L345.643 180.236L335.888 232.862C337.205 233.781 338.508 234.719 339.794 235.679L386.61 209.729L363.984 258.247C365.029 259.462 366.057 260.693 367.063 261.941L418.89 248.54L384.858 289.822C385.57 291.268 386.261 292.725 386.927 294.196H440.422L397.136 325.643C397.16 325.762 397.183 325.881 397.207 326H384.134C370.829 264.266 315.924 218 250.211 218C184.498 218 129.593 264.266 116.288 326H103.213C103.237 325.882 103.26 325.763 103.284 325.645L60 294.196H113.495C113.981 293.123 114.478 292.056 114.988 290.997L80.6016 250.016L132.543 262.965C133.538 261.708 134.552 260.465 135.586 259.241L112.54 210.925L159.582 236.466C160.859 235.496 162.152 234.545 163.461 233.615L153.249 181.076L192.372 217.56C193.859 216.938 195.357 216.337 196.867 215.762L200.135 162.37L228.889 207.505C230.475 207.279 232.069 207.08 233.67 206.904L250.211 156L266.749 206.904ZM250.211 228C310.374 228 360.764 269.834 373.883 326H126.539C139.658 269.834 190.048 228 250.211 228Z"
+						fill="currentColor"
+					/>
+				</svg>
+				<h6>Fajr</h6>
+				<span>5:16AM</span>
+			</div>
 		</div>
-		{#if locationLoading}
-			<div class=" row-span-11 max-h-11/12 min-h-11/12 h-11/12">
-				<Loading {message} />
-			</div>
-		{:else}
-			<div
-				class="bg-transparent grid grid-cols-2 gap-2 row-span-5 max-h-3/12 min-h-3/12 py-2"
-			>
-				<CurrentNextSolah
-					bind:isCurrentSolah={currentSolah}
-					bind:prayer={currentPrayer}
-					bind:adhanPlaying
-				/>
-				<CurrentNextSolah
-					bind:isCurrentSolah={notCurrentSolah}
-					bind:prayer={nextPrayer}
-					bind:notificationsEnabled
-					bind:notificationPermissionGranted
-					bind:notificationTime
-					bind:adhanPlaying
-				/>
-			</div>
-			<div
-				class="bg-transparent grid grid-cols-3 gap-2 row-span-3 max-h-3/12 min-h-3/12 py-2"
-			>
-				<SolahSection
-					bind:hijriDate
-					bind:lat
-					bind:long
-					bind:loading
-					bind:prayerList
-					bind:this={solahSection}
-				/>
-			</div>
-			<div
-				class="bg-transparent grid grid-cols-1 gap-2 row-span-3 max-h-4/12 min-h-4/12 py-2"
-			>
-				<SettingCard
-					{notificationPermissionGranted}
-					{notificationsEnabled}
-					{notificationTime}
-				/>
-			</div>
-		{/if}
-		<!-- Current and Next Solah -->
 	</div>
 </div>
