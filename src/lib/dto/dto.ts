@@ -3,6 +3,7 @@ export interface Prayer {
     name: string;
     time: string;
     isNext: boolean;
+    isNow?: boolean;
     notified: boolean; // Track if notification was already sent
     img?: string;
     icon?: string;
